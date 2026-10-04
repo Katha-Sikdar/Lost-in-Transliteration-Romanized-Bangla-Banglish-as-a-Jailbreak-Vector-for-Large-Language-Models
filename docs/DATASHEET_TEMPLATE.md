@@ -8,7 +8,7 @@ reviewers increasingly expect this for benchmark papers.
 - **Creators and funding:** [names, affiliations, funding]
 
 ## Composition
-- **Instances:** [N] seeds × 5 versions = [N×5] prompts.
+- **Instances:** [N] seeds × 6 versions = [N×6] prompts.
 - **Harmful vs. benign:** [n_harmful] harmful seeds, [n_benign] benign controls.
 - **Categories:** see HARM_TAXONOMY.md; counts per category: [table].
 - **Splits:** test [n] seeds, train [n] seeds (split by seed, stratified by category).

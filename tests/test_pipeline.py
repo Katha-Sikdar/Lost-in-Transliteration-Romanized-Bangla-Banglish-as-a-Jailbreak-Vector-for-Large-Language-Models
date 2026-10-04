@@ -59,6 +59,15 @@ def test_assign_splits_is_stable_and_keeps_existing(tmp_path):
     assert set(a["split"]) == {"train", "test"}
 
 
+def test_prefill_bnscript_only_fills_empty(tmp_path):
+    df = data.load_seeds(make_seeds(tmp_path, n_harmful=2, n_benign=0))
+    df.loc[0, "en_bnscript"] = ""
+    filled = data.prefill_bnscript(df, lambda text: "BN:" + text)
+    assert filled == 1
+    assert df.loc[0, "en_bnscript"].startswith("BN:")
+    assert not df.loc[1, "en_bnscript"].startswith("BN:")
+
+
 def test_expand_is_long_format(tmp_path):
     df = data.assign_splits(data.load_seeds(make_seeds(tmp_path)))
     records = data.expand(df)
@@ -203,7 +212,11 @@ def test_end_to_end_stats(pipeline):
     t = stats.mcnemar_tests(df)
     assert set(t["version"]) <= set(VERSIONS[1:])
     assert t["p_holm"].between(0, 1).all()
-    assert "harmful" in stats.long_table(df).columns
+    long = stats.long_table(df)
+    assert {"harmful", "language", "script"} <= set(long.columns)
+    factorial = long[long["version"].isin(["en", "en_bnscript", "bn", "banglish_std"])]
+    assert factorial["language"].notna().all() and factorial["script"].notna().all()
+    assert long[long["version"] == "code_mixed"]["script"].isna().all()
     assert "# Results" in stats.report(m, t)
 
 

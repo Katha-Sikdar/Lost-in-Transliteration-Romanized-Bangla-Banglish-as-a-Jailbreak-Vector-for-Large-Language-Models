@@ -33,6 +33,7 @@ and update `ABBREVIATIONS` / `SOUND_MERGES` in `banglishjail/noise.py`.
 
 ```bash
 # annotators fill data/raw/pilot_seeds.csv from data/templates/seeds_template.csv
+python -m banglishjail.data prefill-bnscript data/raw/pilot_seeds.csv   # then correct by hand
 python -m banglishjail.data validate data/raw/pilot_seeds.csv
 python -m banglishjail.data split    data/raw/pilot_seeds.csv --train-frac 0
 

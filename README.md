@@ -1,19 +1,37 @@
-# Lost in Transliteration: Romanized Bangla (Banglish) as a Jailbreak Vector for Large Language Models
+# Lost in Transliteration: Why Romanization Breaks LLM Safety
 
-Research project studying whether LLM safety alignment and guard models fail
-on **Banglish**, Bangla written in the Latin alphabet with no standard
-spelling and frequent English code-mixing.
+A controlled, mechanistic study of LLM safety on **Banglish**: Bangla written
+in the Latin alphabet, with no standard spelling and frequent English
+code-mixing.
 
-**Core hypothesis:** LLMs understand Banglish well enough to follow harmful
-requests, but not well enough to recognize them as harmful.
+Recent benchmarks (BanglaVeilGuard, BanglaSafe, and work on code-mixed
+phonetic perturbations; see `paper/intro_related_work.tex`) show *that*
+Banglish weakens LLM safety. This project asks *why*, and how to fix it.
+
+**Core hypothesis:** LLMs understand Banglish through the same pathways as
+English, but their refusal behaviour does not transfer to the Latin-script
+form of Bangla.
+
+## Design
+
+Each seed request is written in six parallel versions. The first four form a
+language × script factorial, which separates the effect of the *script* from
+the effect of the *language*:
+
+| | Latin script | Bengali script |
+|---|---|---|
+| **English** | `en`: How are you? | `en_bnscript`: হাউ আর ইউ? |
+| **Bangla** | `banglish_std`: tumi kemon acho? | `bn`: তুমি কেমন আছো? |
+
+plus `banglish_noisy` (real-world spelling) and `code_mixed` (Banglish–English).
 
 ## Research questions
 
-1. Is the attack success rate higher for Banglish than for English and for Bangla script?
-2. Does real-world spelling variation (vowel dropping, abbreviations) raise it further?
-3. Do guard models (Llama Guard, ShieldGemma, moderation APIs) detect harmful Banglish?
-4. Does harmful Banglish activate the model's refusal direction less strongly?
-5. Do back-transliteration and Banglish safety fine-tuning close the gap?
+1. **Script vs. language:** does the safety gap come from the Latin script, the Bangla language, or their combination?
+2. **Comprehension-controlled ASR:** how much of the gap remains after excluding responses where the model misunderstood?
+3. **Dose–response:** how does attack success grow with real-world spelling noise?
+4. **Mechanism:** does harmful Banglish project less onto the refusal direction, and does adding the direction restore refusals?
+5. **Defenses under adaptive attack:** do normalization, safety fine-tuning, steering and existing Bangla guards (BanglaVeilGuard) survive an attacker who knows the defense?
 
 ## Repository layout
 
@@ -41,7 +59,7 @@ for why each step exists.
 
 ## Status
 
-- [x] Introduction and Related Work draft
+- [x] Introduction and Related Work draft (repositioned against 2024–2026 related work)
 - [x] Methodology section draft
 - [x] Annotation guideline, harm taxonomy, ethics protocol
 - [x] Evaluation, scoring, statistics, guard, mechanistic and defense code (tested offline)
@@ -52,6 +70,7 @@ for why each step exists.
 - [ ] Model and guard-model evaluation
 - [ ] Refusal-direction analysis
 - [ ] Defenses
+- [ ] Read the full BanglaVeilGuard, BanglaSafe and comprehension–containment papers; refine Related Work
 - [ ] Results, Discussion and Abstract
 
 ## Ethics and responsible release

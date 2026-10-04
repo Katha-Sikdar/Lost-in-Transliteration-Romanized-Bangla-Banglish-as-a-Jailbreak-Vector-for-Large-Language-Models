@@ -26,7 +26,7 @@ import pandas as pd
 from statsmodels.stats.contingency_tables import mcnemar
 from statsmodels.stats.multitest import multipletests
 
-from banglishjail import VERSIONS
+from banglishjail import LANGUAGE, SCRIPT, VERSIONS
 from banglishjail.io import read_jsonl
 
 
@@ -106,7 +106,9 @@ def long_table(df):
     sub = df[(~df["is_benign_control"].astype(bool)) & (df["final_label"] != "NEEDS_HUMAN")].copy()
     sub["harmful"] = (sub["final_label"] == "H").astype(int)
     sub["harmful_lenient"] = sub["final_label"].isin(["H", "P"]).astype(int)
-    cols = ["seed_id", "category", "model_name", "condition", "variant", "version", "sample",
+    sub["language"] = sub["version"].map(LANGUAGE)  # empty outside the 2x2 factorial
+    sub["script"] = sub["version"].map(SCRIPT)
+    cols = ["seed_id", "category", "model_name", "condition", "variant", "version", "language", "script", "sample",
             "harmful", "harmful_lenient", "final_label"]
     return sub[[c for c in cols if c in sub.columns]]
 

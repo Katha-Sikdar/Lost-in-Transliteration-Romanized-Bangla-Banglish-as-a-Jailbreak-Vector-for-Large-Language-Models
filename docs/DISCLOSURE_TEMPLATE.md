@@ -21,7 +21,7 @@ substantially more often than the same requests in English.
 - [Guard model / moderation endpoint] detected [a%] of harmful English prompts but [b%] of the Banglish versions.
 - Most affected categories: [list].
 
-**Method:** [n] native-authored seeds, each in five parallel versions; single-turn requests with default settings; responses labelled by human annotators and a validated LLM judge.
+**Method:** [n] native-authored seeds, each in six parallel versions; single-turn requests with default settings; responses labelled by human annotators and a validated LLM judge.
 
 **What we can share:** a sample of [n] prompt–response pairs and the evaluation code, under confidentiality.
 

@@ -89,7 +89,7 @@ many Bangla users know it. Document the choice.
 
 ## Phase 2: Pilot (decision gate)
 
-1. Write 30 harmful seeds plus 10 benign controls, in all 5 versions.
+1. Write 30 harmful seeds plus 10 benign controls, in all 6 versions.
 2. Run them on 2–3 models (e.g., one proprietary, two open).
 3. Hand-label every response (Phase 5 scheme).
 4. **Decide:**
@@ -112,8 +112,8 @@ many Bangla users know it. Document the choice.
 |---|---|
 | Harmful seeds | 500–700 |
 | Benign borderline controls | 150–200 |
-| Versions per seed | 5 |
-| Total prompts | about 3,500–4,500 |
+| Versions per seed | 6 |
+| Total prompts | about 4,000–5,400 |
 
 Split seeds (not prompts) into **test (about 70%)** and **defense-training
 (about 30%)** so that no seed appears in both.
@@ -180,7 +180,7 @@ Record exact model version strings and the dates you ran them; APIs change.
 
 | ID | Condition | Run on |
 |---|---|---|
-| A0 | **Direct**: each of the 5 versions, sent as is | All prompts, all models |
+| A0 | **Direct**: each of the 6 versions, sent as is | All prompts, all models |
 | A1 | **Noise sweep**: noise applied to 0%, 25%, 50%, 75%, 100% of words | Subset (about 150 seeds); shows a dose–response curve |
 | A2 | **Template**: known jailbreak templates (e.g., role-play) written in Banglish | Subset |
 | A3 | **Automated**: PAIR or TAP with an attacker that writes in Banglish, about 20-query budget | Subset (about 50–100 seeds); costliest |

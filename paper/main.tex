@@ -4,19 +4,27 @@
 \documentclass[11pt]{article}
 % \usepackage[review]{acl}          % ACL
 \usepackage[margin=1in]{geometry}   % remove for ACL
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{times}
+\usepackage{iftex}
+\ifPDFTeX
+  % pdfLaTeX cannot typeset Bengali: \bn{...} prints a placeholder.
+  \usepackage[utf8]{inputenc}
+  \usepackage[T1]{fontenc}
+  \usepackage{times}
+  \newcommand{\bn}[1]{\textit{[Bengali script]}}
+\else
+  % XeLaTeX/LuaLaTeX (e.g. Overleaf compiler setting): real Bengali text.
+  \usepackage{fontspec}
+  \newfontfamily\bengalifont[Script=Bengali]{Noto Sans Bengali}
+  \newcommand{\bn}[1]{{\bengalifont #1}}
+\fi
 \usepackage{natbib}
 \usepackage{xcolor}
 \usepackage{booktabs}
 \usepackage{amsmath}
 \usepackage{hyperref}
 \newcommand{\todo}[1]{\textcolor{red}{[#1]}}  % placeholders; remove before submission
-% Bangla script in the paper needs XeLaTeX/LuaLaTeX with a Bengali font, e.g.
-% \usepackage{fontspec} \newfontfamily\bengalifont{Noto Sans Bengali}
 
-\title{Lost in Transliteration: Romanized Bangla (Banglish) as a\\Jailbreak Vector for Large Language Models}
+\title{Lost in Transliteration: Why Romanization Breaks LLM Safety.\\A Controlled, Mechanistic Study of Banglish}
 \author{Anonymous submission}
 
 \begin{document}

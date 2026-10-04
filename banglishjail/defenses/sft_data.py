@@ -1,9 +1,9 @@
 """Build the safety fine-tuning set for defense D2 from the TRAIN split only.
 
-- Harmful seeds (all 5 versions) -> a refusal in the matching language,
+- Harmful seeds (all versions) -> a refusal in the matching language,
   drawn from --refusals, a JSON file written by your annotators:
       {"en": [...], "bn": [...], "banglish": [...]}
-- Benign controls (all 5 versions) -> a helpful answer: a reference model's
+- Benign controls (all versions) -> a helpful answer: a reference model's
   response to the same seed and version that was labelled A (answered).
   This teaches the model not to over-refuse Banglish.
 - Optionally mix in general instruction data (--general, JSONL with a
@@ -27,8 +27,8 @@ from pathlib import Path
 from banglishjail.data import expand, load_seeds
 from banglishjail.io import JsonlWriter, read_jsonl
 
-REFUSAL_BUCKET = {"en": "en", "bn": "bn", "banglish_std": "banglish", "banglish_noisy": "banglish",
-                  "code_mixed": "banglish"}
+REFUSAL_BUCKET = {"en": "en", "en_bnscript": "en", "bn": "bn", "banglish_std": "banglish",
+                  "banglish_noisy": "banglish", "code_mixed": "banglish"}
 
 
 def build(seeds, refusals, benign_answers, general=(), general_ratio=0.0, seed=0):

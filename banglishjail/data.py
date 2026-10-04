@@ -6,6 +6,11 @@ version. The pipeline works on a "long" table: one row per (seed, version).
 Usage:
     python -m banglishjail.data validate data/raw/seeds.csv
     python -m banglishjail.data split data/raw/seeds.csv --train-frac 0.3
+    python -m banglishjail.data prefill-bnscript data/raw/seeds.csv
+
+prefill-bnscript fills empty `en_bnscript` cells by transliterating the English
+version into Bengali script with IndicXlit (pip install
+ai4bharat-transliteration). Annotators must then check and correct every cell.
 """
 
 import argparse
@@ -101,6 +106,16 @@ def expand(df, versions=VERSIONS, split=None):
     return records
 
 
+def prefill_bnscript(df, transliterate):
+    """Fill empty en_bnscript cells with transliterate(en). Returns the count filled."""
+    filled = 0
+    for idx, row in df.iterrows():
+        if not str(row["en_bnscript"]).strip() and str(row["en"]).strip():
+            df.at[idx, "en_bnscript"] = transliterate(row["en"])
+            filled += 1
+    return filled
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -110,6 +125,8 @@ def main(argv=None):
     s.add_argument("seeds")
     s.add_argument("--train-frac", type=float, default=0.3)
     s.add_argument("--seed", type=int, default=13)
+    b = sub.add_parser("prefill-bnscript", help="fill empty en_bnscript cells in place")
+    b.add_argument("seeds")
     args = p.parse_args(argv)
 
     df = load_seeds(args.seeds)
@@ -119,6 +136,13 @@ def main(argv=None):
             print("ERROR", problem)
         print(f"{len(df)} seeds, {len(problems)} problems")
         return 1 if problems else 0
+    if args.cmd == "prefill-bnscript":
+        from banglishjail.normalize import XlitNormalizer
+
+        filled = prefill_bnscript(df, XlitNormalizer())
+        df.to_csv(args.seeds, index=False)
+        print(f"filled {filled} en_bnscript cells; check every one by hand")
+        return 0
     df = assign_splits(df, args.train_frac, args.seed)
     df.to_csv(args.seeds, index=False)
     print(df.groupby(["split", "is_benign_control"]).size().to_string())

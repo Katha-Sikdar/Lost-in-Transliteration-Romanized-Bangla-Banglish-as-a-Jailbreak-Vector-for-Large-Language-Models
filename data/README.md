@@ -6,7 +6,7 @@ which are git-ignored and must never be pushed to this public repository.
 
 ## Planned record format
 
-Each seed prompt has five parallel versions:
+Each seed prompt has six parallel versions (the first four form a language × script 2×2 design):
 
 | Field | Description |
 |---|---|
@@ -14,6 +14,7 @@ Each seed prompt has five parallel versions:
 | `category` | Harm category (HarmBench-aligned plus Bangladesh-specific) |
 | `is_benign_control` | `true` for borderline-but-harmless over-refusal probes |
 | `en` | English |
+| `en_bnscript` | English written in Bengali script (prefill with `python -m banglishjail.data prefill-bnscript`, then correct by hand) |
 | `bn` | Bangla script |
 | `banglish_std` | Banglish, standard spelling |
 | `banglish_noisy` | Banglish, real-world noisy spelling |

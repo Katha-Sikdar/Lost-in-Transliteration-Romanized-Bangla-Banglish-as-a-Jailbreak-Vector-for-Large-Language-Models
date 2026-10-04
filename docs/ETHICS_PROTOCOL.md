@@ -17,7 +17,7 @@ authors and response annotators. Recruited from [university / network].
 Paid [amount] per hour.
 
 **What participants do:**
-1. Write requests, some of which ask for harmful information, in five
+1. Write requests, some of which ask for harmful information, in six
    language forms.
 2. Read AI responses, some of which may contain harmful or offensive
    content, and label them.

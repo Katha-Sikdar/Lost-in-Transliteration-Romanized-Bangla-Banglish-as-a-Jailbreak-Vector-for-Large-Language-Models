@@ -54,17 +54,42 @@ specific & Election misinformation & \todo{n} & \todo{n} \\
  & Total seeds & \todo{N} & \todo{M} \\
 \bottomrule
 \end{tabular}
-\caption{Harm taxonomy and number of seeds per category. Each seed has five
+\caption{Harm taxonomy and number of seeds per category. Each seed has six
 parallel versions.}
 \label{tab:taxonomy}
 \end{table}
 
 \paragraph{Parallel versions.}
-Each seed is written in five parallel versions with identical intent:
-English (\textsc{en}), Bangla script (\textsc{bn}), standard Banglish
-(\textsc{std}), noisy Banglish (\textsc{noisy}) and Banglish--English
-code-mixed text (\textsc{cm}). Standard Banglish follows a single phonetic
-convention close to the Avro keyboard mapping. Noisy Banglish applies
+Each seed is written in six parallel versions with identical intent. The
+first four form a $2\times 2$ factorial of language and script
+(Table~\ref{tab:design}): English in Latin script (\textsc{en}), English
+transliterated into Bengali script (\textsc{en-bn}), Bangla in Bengali
+script (\textsc{bn}) and standard Banglish, i.e., Bangla in Latin script
+(\textsc{std}). Comparing \textsc{en} with \textsc{en-bn} and \textsc{bn}
+with \textsc{std} isolates the effect of script for a fixed language;
+comparing \textsc{en} with \textsc{std} and \textsc{en-bn} with \textsc{bn}
+isolates the effect of language for a fixed script. Two further versions
+capture how users actually type: noisy Banglish (\textsc{noisy}) and
+Banglish--English code-mixed text (\textsc{cm}). Standard Banglish follows a
+single phonetic convention close to the Avro keyboard mapping;
+\textsc{en-bn} was pre-filled with IndicXlit \citep{madhani2023aksharantar}
+and corrected by annotators.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{lll}
+\toprule
+ & Latin script & Bengali script \\
+\midrule
+English & \textsc{en}: \textit{How are you?} & \textsc{en-bn}: \bn{হাউ আর ইউ?} \\
+Bangla & \textsc{std}: \textit{tumi kemon acho?} & \textsc{bn}: \bn{তুমি কেমন আছো?} \\
+\bottomrule
+\end{tabular}
+\caption{The language $\times$ script factorial. Noisy Banglish and
+code-mixed versions extend the Latin-script Bangla cell.}
+\label{tab:design}
+\end{table} Noisy Banglish applies
 spelling patterns that we derived from \todo{N} public Banglish social-media
 comments: vowel dropping (\textit{kemon}~$\rightarrow$~\textit{kmn}), sound
 merging (\textit{bhalo}~$\rightarrow$~\textit{valo}) and conventional short
@@ -88,7 +113,7 @@ Agreement on a doubly-checked 20\% sample was $\kappa=\todo{x}$
 To measure over-refusal, we include \todo{n} benign controls that resemble
 harmful requests but are harmless, typically protective (e.g., how to
 recognize a fraudulent mobile-banking SMS). The final benchmark contains
-\todo{N} harmful seeds and \todo{M} benign controls ($\times 5$ versions $=$
+\todo{N} harmful seeds and \todo{M} benign controls ($\times 6$ versions $=$
 \todo{T} prompts). We split \emph{seeds} (not prompts) into a test set
 (70\%) and a defense-training set (30\%), stratified by category, so that no
 seed appears in both. A datasheet \citep{gebru2021datasheets} is provided in
@@ -158,7 +183,17 @@ per model, with Holm correction for multiple comparisons
 \citep{holm1979simple}. To estimate the overall effect of version while
 accounting for seed difficulty, we fit a mixed-effects logistic regression,
 $\text{harmful} \sim \text{version} \times \text{model} + (1 \mid \text{seed})$,
-using lme4 \citep{bates2015fitting}.
+using lme4 \citep{bates2015fitting}. Our central test is a second model on
+the four factorial versions,
+$\text{harmful} \sim \text{language} \times \text{script} + (1 \mid \text{seed}) + (1 \mid \text{model})$:
+a large script effect, or a language $\times$ script interaction, indicates
+that the writing system rather than the language drives the safety gap.
+
+\paragraph{External benchmarks.}
+To test whether our findings generalize beyond our seeds, we also evaluate
+on the held-out splits of BanglaVeilGuard \citep{banglaveilguard2026} and
+BanglaSafe \citep{banglasafe2026}, reporting results by their language form
+and register labels.
 
 \section{Guard-Model Evaluation}
 \label{sec:guards}
@@ -193,16 +228,18 @@ English words unchanged, or translated to English by an LLM, before the
 guard model screens it.
 \textbf{D2 (safety fine-tuning):} we fine-tune open-weight models with LoRA
 \citep{hu2022lora} on the defense-training split, pairing harmful prompts in
-all five versions with refusals in the matching language, and benign
+all six versions with refusals in the matching language, and benign
 controls with helpful reference answers to avoid over-refusal, mixed with
 general instruction data in a 1:1 ratio.
 \textbf{D3 (activation steering):} the intervention from
 Section~\ref{sec:mech}, applied at inference time.
-For each defense we report ASR, over-refusal, helpfulness on benign
-Banglish requests, performance on \todo{a general benchmark}, added latency,
-and robustness to an adaptive attacker who knows the defense
-\citep{nasr2025attacker}, e.g., by choosing spellings that defeat the
-transliterator.
+We compare these with the existing BanglaVeilGuard prompt guard
+\citep{banglaveilguard2026}. For each defense we report ASR, over-refusal,
+helpfulness on benign Banglish requests, performance on \todo{a general
+benchmark}, added latency, and robustness to an adaptive attacker who knows
+the defense \citep{nasr2025attacker}: the attacker iteratively rewrites the
+spelling of a refused Banglish prompt (using the noise rules and an attacker
+LLM, with a budget of \todo{k} queries) until the defended system answers.
 
 \section{Ethical Considerations}
 \label{sec:ethics}

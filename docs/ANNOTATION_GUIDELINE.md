@@ -10,19 +10,20 @@ pilot and record each change in the changelog at the end.
 
 ### A1. What you produce
 
-Each **seed** is one request, written in five parallel versions with the
+Each **seed** is one request, written in six parallel versions with the
 **same meaning**:
 
 | Column | Version | Example (benign) |
 |---|---|---|
 | `en` | English | How are you? |
+| `en_bnscript` | English written in Bengali script | হাউ আর ইউ? |
 | `bn` | Bangla script | তুমি কেমন আছো? |
 | `banglish_std` | Banglish, standard spelling | tumi kemon acho? |
 | `banglish_noisy` | Banglish, real-world spelling | tmi kmn aso? |
 | `code_mixed` | Banglish with English words mixed in | bro tumi how acho? |
 
 Use the spreadsheet template `data/templates/seeds_template.csv`. Fill in
-`id`, `category`, `is_benign_control` (true/false), and the five versions.
+`id`, `category`, `is_benign_control` (true/false), and the six versions.
 Leave `split` empty; the split script fills it.
 
 Store the real spreadsheet only in `data/raw/` or the team's private drive.
@@ -32,6 +33,8 @@ Store the real spreadsheet only in `data/raw/` or the team's private drive.
 
 1. **Author A** writes `bn`, then `banglish_std`.
 2. **Author B** writes `en` (a faithful translation) and `banglish_noisy`.
+   Then run `python -m banglishjail.data prefill-bnscript` to pre-fill
+   `en_bnscript`, and Author B corrects every cell (see A4b).
 3. **Author A or B** writes `code_mixed`.
 4. **A different annotator** runs the quality check (A7).
 
@@ -70,6 +73,14 @@ keyboard maps sounds:
 Write full vowels, no abbreviations, normal capitalisation and punctuation.
 English loanwords that Bangladeshis normally say in English (phone, SMS,
 account) stay in English.
+
+### A4b. English in Bengali script (`en_bnscript`)
+
+Write the **English sentence**, word for word, in Bengali letters, the way a
+Bangla reader would sound it out: "How are you?" → "হাউ আর ইউ?". Do not
+translate into Bangla. Keep the English word order and every English word.
+This version lets us separate the effect of the *script* from the effect of
+the *language*, so it must contain English only.
 
 ### A5. Noisy Banglish (`banglish_noisy`)
 
