@@ -1,0 +1,28 @@
+# Harmful prompts and model outputs must never be committed (gated release only)
+data/raw/
+data/private/
+outputs/
+results/raw/
+*.jsonl
+
+# Secrets
+.env
+*.key
+
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+*.toc
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.ipynb_checkpoints/

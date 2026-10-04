@@ -1,0 +1,180 @@
+% ============================================================
+% Lost in Transliteration: Romanized Bangla (Banglish) as a
+% Jailbreak Vector for Large Language Models
+% Draft: Introduction + Related Work
+% Requires: \usepackage{natbib} (ACL style uses \citet / \citep)
+%           \usepackage{xcolor}
+% Placeholders marked \todo{...} must be filled from your results.
+% Citations marked "% VERIFY" must be checked before submission.
+% ============================================================
+
+\newcommand{\todo}[1]{\textcolor{red}{[#1]}}
+
+\section{Introduction}
+
+Large language models (LLMs) are now deployed as general-purpose assistants
+to hundreds of millions of users worldwide. To prevent misuse, model developers
+align these systems with human preferences through supervised fine-tuning and
+reinforcement learning from human feedback
+\citep{ouyang2022training, bai2022constitutional}, and further protect them with
+input--output guard models \citep{inan2023llamaguard, zeng2024shieldgemma}.
+Despite these efforts, a growing body of work shows that safety alignment can
+be circumvented by \emph{jailbreak} attacks, ranging from hand-crafted
+role-play prompts \citep{shen2024anything} and persuasion
+\citep{zeng2024johnny} to automated optimization
+\citep{zou2023universal, chao2023jailbreaking, mehrotra2024tree}.
+\citet{wei2023jailbroken} attribute many of these failures to
+\emph{mismatched generalization}: a model's capabilities extend to input
+distributions that its safety training never covered.
+
+Language is one of the most consequential such distributions. Safety training
+data is overwhelmingly in English, and prior work has shown that simply
+translating harmful requests into low-resource languages substantially
+increases attack success rates
+\citep{yong2023lowresource, deng2024multilingual, wang2024languages}.
+However, existing multilingual safety benchmarks share a common assumption:
+each language is represented in its \emph{native script}, usually obtained by
+machine-translating English prompts. This assumption does not reflect how a
+large fraction of the world actually types. Speakers of many South Asian
+languages routinely write their language in the Latin alphabet, a practice
+known as \emph{romanization} \citep{roark2020dakshina}.
+
+Bangla (Bengali) is a prominent example. With \todo{over 230 million native
+speakers; cite Ethnologue or a census source}, it is among the most widely
+spoken languages in the world, yet it remains under-resourced in NLP
+\citep{joshi2020state, bhattacharjee2022banglabert}. In everyday digital
+communication---social media, messaging apps and, increasingly, chatbots---Bangla
+speakers frequently write in \emph{Banglish}: romanized Bangla with no
+standardized orthography, often mixed with English words
+(e.g., \textit{``tumi kemon acho?''} or \textit{``tmi kmn aso?''} for
+``How are you?''). Banglish therefore sits at an unusual intersection: its
+surface form is Latin-script and shares tokens with English, while its
+underlying language is a low-resource one that safety training rarely covers.
+
+We hypothesize that this intersection creates a distinct safety blind spot.
+Because Banglish is tokenized much like English, capable LLMs may
+\emph{understand} romanized harmful requests well enough to comply, while
+their safety mechanisms---tuned on English and on native-script data---fail to
+\emph{recognize} those requests as harmful. Moreover, the absence of a
+standard spelling means that a single request admits many surface variants,
+each of which may evade keyword- or classifier-based filters differently.
+To our knowledge, no prior work has systematically evaluated LLM safety on
+romanized Bangla.
+
+A key methodological challenge is distinguishing a genuine jailbreak from a
+comprehension failure: a model that fails to refuse may simply have
+misunderstood the input. Prior multilingual evaluations rarely control for
+this. We therefore score every response along two axes---whether the model
+understood the request, and whether its response was harmful---and count only
+on-topic harmful responses as successful attacks.
+
+In this paper, we make the following contributions:
+\begin{enumerate}
+    \item \textbf{BanglishJail}, the first benchmark of native-authored,
+    culturally grounded harmful prompts in romanized Bangla. Each of
+    \todo{N} seed prompts is provided in five parallel forms: English, Bangla
+    script, standard Banglish, noisy real-world Banglish, and Banglish--English
+    code-mixed text. The benchmark covers \todo{K} harm categories, including
+    region-specific harms such as communal incitement, election
+    misinformation and mobile-financial-service fraud, together with benign
+    borderline prompts for measuring over-refusal.
+
+    \item A large-scale evaluation of \todo{M} proprietary and open-weight
+    LLMs and \todo{G} guard models. We find that \todo{summarize headline
+    result, e.g., ``attack success rates on noisy Banglish are X$\times$
+    higher than on English, while guard-model recall drops from Y\% to Z\%''}.
+
+    \item A mechanistic analysis showing \todo{e.g., ``that harmful Banglish
+    prompts activate the refusal direction \citep{arditi2024refusal}
+    significantly less than their English and Bangla-script counterparts''},
+    offering an explanation for why safety fails to transfer to romanized
+    text.
+
+    \item Simple and effective defenses---back-transliteration before
+    moderation and lightweight safety fine-tuning on Banglish data---which
+    reduce attack success by \todo{X\%} with \todo{minimal / Y\%} loss in
+    helpfulness.
+\end{enumerate}
+
+We release BanglishJail under gated access to support research on
+romanized-language safety, and we disclosed our findings to the affected
+model providers prior to publication. Although we focus on Bangla, our
+methodology directly applies to other widely romanized languages such as
+Hindi (Hinglish), Urdu and Arabic (Arabizi).
+
+% ============================================================
+\section{Related Work}
+
+\paragraph{Jailbreak attacks on aligned LLMs.}
+Early jailbreaks relied on manually crafted prompts such as role-play and
+``Do Anything Now'' templates, which \citet{shen2024anything} collected and
+characterized at scale. \citet{wei2023jailbroken} proposed two failure modes
+of safety training---competing objectives and mismatched
+generalization---the latter of which motivates our study.
+Subsequent work automated jailbreak discovery: GCG \citep{zou2023universal}
+optimizes adversarial suffixes with gradients, PAIR \citep{chao2023jailbreaking}
+and TAP \citep{mehrotra2024tree} use an attacker LLM to iteratively refine
+prompts in a black-box setting, persuasive adversarial prompts
+\citep{zeng2024johnny} exploit social-science persuasion techniques, and
+many-shot jailbreaking \citep{anil2024manyshot} exploits long context windows.
+Standardized benchmarks such as HarmBench \citep{mazeika2024harmbench} and
+JailbreakBench \citep{chao2024jailbreakbench} enable consistent comparison,
+but are English-only. Our work is complementary: rather than proposing a new
+optimization procedure, we study a \emph{naturally occurring} input
+distribution that existing defenses do not cover.
+
+\paragraph{Multilingual LLM safety.}
+\citet{yong2023lowresource} showed that translating unsafe English prompts
+into low-resource languages such as Zulu and Scots Gaelic bypasses GPT-4's
+safeguards. \citet{deng2024multilingual} introduced MultiJail, a benchmark
+spanning nine non-English languages including Bengali, and found that unsafe
+output rates increase as language resource availability decreases.
+\citet{wang2024languages} proposed XSafety, a multilingual safety benchmark
+covering \todo{verify number and list of languages}, and
+\citet{shen2024language} analyzed why safety degrades in non-English contexts.
+\citet{aakanksha2024multilingual} collected human-written multilingual
+red-teaming prompts and studied the trade-off between global and local harm
+mitigation. All of these works represent each language in its native script,
+predominantly via machine translation of English prompts. In contrast, we
+study the romanized form in which Bangla is commonly written online, use
+native-authored rather than translated prompts, and include
+culturally specific harm categories.
+
+\paragraph{Code-switching and romanized text.}
+Code-mixing is pervasive in multilingual communities and has long challenged
+NLP systems \citep{khanuja2020gluecos}. Recent work on code-switching
+red-teaming \citep{yoo2024codeswitching} % VERIFY venue and authors
+shows that mixing languages within a prompt can elicit unsafe behavior.
+Romanization is a related but distinct phenomenon: the language does not
+change, only the script, and spelling varies widely across writers.
+Resources such as the Dakshina dataset \citep{roark2020dakshina} and the
+Aksharantar corpus with IndicXlit models \citep{madhani2023aksharantar}
+support transliteration between romanized and native scripts for South Asian
+languages, including Bangla. We use such resources both to analyze spelling
+variation and to construct a back-transliteration defense. To our knowledge,
+the safety implications of romanized Bangla have not been studied.
+\todo{Search for and cite any recent work on Hinglish / romanized-language
+jailbreaks; position against it explicitly.}
+
+\paragraph{Bangla NLP.}
+Despite its large speaker population, Bangla is classified as a
+low-resource language \citep{joshi2020state}. Prior work has developed
+pretrained models such as BanglaBERT \citep{bhattacharjee2022banglabert} and
+datasets for tasks such as \todo{cite Bangla hate-speech / sentiment /
+Banglish datasets}. However, safety evaluation of generative LLMs in
+Bangla---and in Banglish in particular---remains largely unexplored.
+
+\paragraph{Defenses and the mechanics of refusal.}
+Defenses against jailbreaks include guard models such as Llama Guard
+\citep{inan2023llamaguard} and ShieldGemma \citep{zeng2024shieldgemma},
+input perturbation methods such as SmoothLLM \citep{robey2023smoothllm},
+and classifier-based safeguards \citep{sharma2025constitutional}. Most guard
+models officially support a limited set of languages
+\todo{verify which languages each guard model lists}.
+On the mechanistic side, \citet{arditi2024refusal} showed that refusal in
+chat models is mediated by a single direction in the residual stream, and
+\citet{qi2025safety} argued that current safety alignment is
+``shallow,'' concentrated in the first few output tokens. \citet{qi2024finetuning}
+further showed that alignment is fragile under fine-tuning. We build on
+these insights to explain why safety fails to transfer to romanized
+inputs and to design targeted defenses.
