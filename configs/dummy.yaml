@@ -1,0 +1,8 @@
+# Offline configuration for dry runs and tests (no API calls, no cost).
+note: "dummy dry run"
+models:
+  - {name: dummy-a, provider: dummy, model: dummy}
+  - {name: dummy-b, provider: dummy, model: dummy}
+judge: {name: judge, provider: dummy, model: dummy}
+guards:
+  - {name: dummy-guard, type: dummy}

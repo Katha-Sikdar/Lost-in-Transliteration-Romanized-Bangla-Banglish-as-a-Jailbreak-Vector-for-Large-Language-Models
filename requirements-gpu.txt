@@ -1,0 +1,8 @@
+# Mechanistic analysis and defenses (Phases 7-8), on a GPU machine
+torch>=2.2
+transformers>=4.44
+accelerate>=0.33
+datasets>=2.20
+peft>=0.13
+trl>=0.12
+ai4bharat-transliteration>=1.1   # defense D1 (back-transliteration)

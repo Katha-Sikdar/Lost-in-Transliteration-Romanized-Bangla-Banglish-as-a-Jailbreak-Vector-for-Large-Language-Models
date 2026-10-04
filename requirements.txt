@@ -1,0 +1,10 @@
+# API evaluation, judging and statistics
+anthropic>=1.0
+openai>=1.40
+google-genai>=1.0
+pandas>=2.0
+numpy>=1.26
+scipy>=1.11
+statsmodels>=0.14
+pyyaml>=6.0
+pytest>=8.0

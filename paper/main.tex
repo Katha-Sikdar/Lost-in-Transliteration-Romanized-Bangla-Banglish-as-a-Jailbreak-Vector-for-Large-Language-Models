@@ -1,0 +1,52 @@
+% Main paper file. For ACL Rolling Review, download the official ACL style
+% (https://github.com/acl-org/acl-style-files), put acl.sty and
+% acl_natbib.bst next to this file, and switch to the two lines marked ACL.
+\documentclass[11pt]{article}
+% \usepackage[review]{acl}          % ACL
+\usepackage[margin=1in]{geometry}   % remove for ACL
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{times}
+\usepackage{natbib}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\newcommand{\todo}[1]{\textcolor{red}{[#1]}}  % placeholders; remove before submission
+% Bangla script in the paper needs XeLaTeX/LuaLaTeX with a Bengali font, e.g.
+% \usepackage{fontspec} \newfontfamily\bengalifont{Noto Sans Bengali}
+
+\title{Lost in Transliteration: Romanized Bangla (Banglish) as a\\Jailbreak Vector for Large Language Models}
+\author{Anonymous submission}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\todo{Write last: problem, BanglishJail, key numbers, mechanism, defenses.}
+\end{abstract}
+
+\input{intro_related_work}  % Introduction + Related Work
+\input{methodology}         % Threat model ... Ethics
+
+\section{Results}
+\todo{Main ASR table, comprehension, noise sweep, guard models, judge validation.}
+
+\section{Analysis}
+\todo{Tokenization, refusal direction, cosine similarity, steering.}
+
+\section{Discussion and Limitations}
+\todo{Generalization to Hinglish, Roman Urdu, Arabizi; dialect coverage; API drift.}
+
+\section{Conclusion}
+\todo{}
+
+\bibliographystyle{plainnat}  % ACL: acl_natbib
+\bibliography{references}
+
+\appendix
+\section{Annotation Guideline}
+\section{Decoding Settings}
+\section{Datasheet}
+
+\end{document}

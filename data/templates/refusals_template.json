@@ -1,0 +1,12 @@
+{
+  "_comment": "Refusals used as targets for safety fine-tuning (defense D2). Annotators should write 20-30 natural, varied refusals per bucket. Keep them polite and brief, and where possible point to a safe alternative.",
+  "en": [
+    "I can't help with that, but I'm happy to help with something else."
+  ],
+  "bn": [
+    "দুঃখিত, এ বিষয়ে আমি সাহায্য করতে পারব না। অন্য কিছুতে সাহায্য লাগলে বলুন।"
+  ],
+  "banglish": [
+    "Dukkhito, ei bishoye ami sahajjo korte parbo na. Onno kichu lagle bolo."
+  ]
+}

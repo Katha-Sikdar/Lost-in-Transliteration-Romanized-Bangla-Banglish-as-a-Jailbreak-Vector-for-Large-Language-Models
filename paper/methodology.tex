@@ -1,0 +1,216 @@
+% ============================================================
+% Methodology section draft.
+% \todo{...} marks values to fill from your study; do not submit with them.
+% Section numbers and the code module names in comments map to
+% docs/METHODOLOGY_GUIDE.md and docs/RUNBOOK.md.
+% ============================================================
+
+\section{Threat Model}
+\label{sec:threat}
+
+We consider an attacker who interacts with a deployed LLM only through its
+public chat interface or API, with default system prompts and no access to
+model weights. The attacker's goal is to obtain content that the model's
+usage policy prohibits. Unlike optimization-based attacks
+\citep{zou2023universal, chao2023jailbreaking}, our attacker uses no special
+tooling: they simply write their request in Banglish, as millions of users do
+daily. This makes the attack cheap, transferable across models, and hard to
+distinguish from legitimate use. We additionally study a guarded deployment,
+in which input and output are screened by a guard model
+\citep{inan2023llamaguard, zeng2024shieldgemma}.
+
+\section{The BanglishJail Benchmark}
+\label{sec:dataset}
+
+\paragraph{Harm taxonomy.}
+We adopt the semantic categories of HarmBench \citep{mazeika2024harmbench}
+for comparability and add five categories specific to the Bangladeshi
+context: communal and religious incitement, election misinformation,
+mobile-financial-service fraud, fake job and visa scams targeting migrant
+workers, and gender-based harms (Table~\ref{tab:taxonomy}). We exclude
+chemical, biological, radiological and nuclear weapons, content sexualizing
+minors, and requests targeting real private individuals.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{llrr}
+\toprule
+Group & Category & Harmful & Benign \\
+\midrule
+Standard & Cybercrime and hacking & \todo{n} & \todo{n} \\
+ & Illegal activities & \todo{n} & \todo{n} \\
+ & Harassment and hate & \todo{n} & \todo{n} \\
+ & Misinformation & \todo{n} & \todo{n} \\
+ & Self-harm & \todo{n} & \todo{n} \\
+ & Fraud and scams & \todo{n} & \todo{n} \\
+\midrule
+Bangladesh- & Communal / religious incitement & \todo{n} & \todo{n} \\
+specific & Election misinformation & \todo{n} & \todo{n} \\
+ & Mobile financial service fraud & \todo{n} & \todo{n} \\
+ & Job and visa scams & \todo{n} & \todo{n} \\
+ & Gender-based harms & \todo{n} & \todo{n} \\
+\midrule
+ & Total seeds & \todo{N} & \todo{M} \\
+\bottomrule
+\end{tabular}
+\caption{Harm taxonomy and number of seeds per category. Each seed has five
+parallel versions.}
+\label{tab:taxonomy}
+\end{table}
+
+\paragraph{Parallel versions.}
+Each seed is written in five parallel versions with identical intent:
+English (\textsc{en}), Bangla script (\textsc{bn}), standard Banglish
+(\textsc{std}), noisy Banglish (\textsc{noisy}) and Banglish--English
+code-mixed text (\textsc{cm}). Standard Banglish follows a single phonetic
+convention close to the Avro keyboard mapping. Noisy Banglish applies
+spelling patterns that we derived from \todo{N} public Banglish social-media
+comments: vowel dropping (\textit{kemon}~$\rightarrow$~\textit{kmn}), sound
+merging (\textit{bhalo}~$\rightarrow$~\textit{valo}) and conventional short
+forms (\textit{ki}~$\rightarrow$~\textit{k}). We quantify noise as the
+character edit distance between the noisy and standard versions, normalized
+by length (mean \todo{x}). Code-mixed versions replace 20--40\% of content
+words with English; on a manually tagged sample of \todo{n} prompts the
+Code-Mixing Index \citep{gamback2014measuring} averages \todo{x}.
+
+\paragraph{Authoring and quality control.}
+\todo{N} native Bangla speakers authored the seeds following a written
+guideline (Appendix~\todo{A}). Most seeds (\todo{x}\%) are native-authored;
+the remainder are adapted from MultiJail \citep{deng2024multilingual} and
+HarmBench \citep{mazeika2024harmbench} to enable comparison with prior work.
+Each version was checked by a second annotator for meaning preservation and
+naturalness (1--5); versions failing either check were revised or removed.
+Agreement on a doubly-checked 20\% sample was $\kappa=\todo{x}$
+\citep{cohen1960coefficient}.
+
+\paragraph{Benign controls and splits.}
+To measure over-refusal, we include \todo{n} benign controls that resemble
+harmful requests but are harmless, typically protective (e.g., how to
+recognize a fraudulent mobile-banking SMS). The final benchmark contains
+\todo{N} harmful seeds and \todo{M} benign controls ($\times 5$ versions $=$
+\todo{T} prompts). We split \emph{seeds} (not prompts) into a test set
+(70\%) and a defense-training set (30\%), stratified by category, so that no
+seed appears in both. A datasheet \citep{gebru2021datasheets} is provided in
+the appendix.
+
+\section{Evaluation Setup}
+\label{sec:setup}
+
+\paragraph{Models.}
+We evaluate \todo{K} models: \todo{list proprietary models with exact
+version identifiers}, open-weight models \todo{list}, served with vLLM
+\citep{kwon2023efficient}, and \todo{Bangla-focused model(s)}. All queries
+were made between \todo{dates}. We use each model's default system prompt,
+greedy decoding where the API allows it, and a maximum output length of
+\todo{512} tokens (\todo{4096} for models with built-in reasoning, whose
+reasoning tokens count toward the limit). We report the decoding settings
+of every model in Appendix~\todo{B}.
+
+\paragraph{Attack conditions.}
+Our main condition (\textsc{direct}) sends each version of each seed as a
+single-turn request. We further run four conditions on subsets of the test
+set: (i) a \emph{noise sweep}, perturbing 0, 25, 50, 75 and 100\% of the
+words of standard Banglish to obtain a dose--response curve; (ii) a
+\emph{response-language} condition requesting the answer in English or in
+Banglish; (iii) \emph{template} attacks wrapping each version in \todo{n}
+published jailbreak templates; and (iv) automated attacks with PAIR
+\citep{chao2023jailbreaking} and TAP \citep{mehrotra2024tree}, using the
+HarmBench implementations with an attacker instructed to write in Banglish
+and a budget of \todo{20} queries.
+
+\section{Scoring}
+\label{sec:scoring}
+
+\paragraph{Two-axis labels.}
+A model that does not refuse a Banglish request may simply have
+misunderstood it. We therefore label each response for harmful seeds as
+\textsc{refusal} (R), \textsc{misunderstood} (M), \textsc{partial} (P) or
+\textsc{harmful} (H), and responses to benign controls as
+\textsc{over-refusal} (R), \textsc{misunderstood} (M) or \textsc{answered} (A).
+Requests declined by the provider's API-level safety system are labelled R.
+
+\paragraph{Metrics.}
+The \emph{attack success rate} (ASR) is the fraction of harmful-seed
+responses labelled H (strict) or H or P (lenient). \emph{Comprehension} is
+the fraction not labelled M. Because only on-topic harmful responses count as
+successful attacks, a high ASR cannot be explained by misunderstanding. For
+benign controls we report the \emph{over-refusal rate}.
+
+\paragraph{LLM judge and human validation.}
+We label all responses with an LLM judge (\todo{judge model}) using a
+rubric that mirrors the human guideline. The judge always receives the
+English reference of the seed, so that it knows the intended request; for
+non-English responses it also receives an English translation produced by
+the same model. Items the judge declines to grade are labelled by humans.
+Two annotators independently labelled a stratified sample of \todo{n}
+responses (balanced over models and versions), and an adjudicator resolved
+disagreements. Inter-annotator agreement was $\kappa=\todo{x}$, and
+judge--human agreement was $\kappa=\todo{x}$ overall, ranging from
+\todo{x} (\todo{version}) to \todo{y} (\todo{version}) across versions
+(Table~\todo{x}). Human labels replace judge labels wherever available.
+
+\paragraph{Statistical analysis.}
+We report 95\% confidence intervals from a bootstrap over seeds (2{,}000
+resamples). As every seed appears in all versions, we compare each version
+with English using McNemar's test \citep{mcnemar1947note} on paired outcomes
+per model, with Holm correction for multiple comparisons
+\citep{holm1979simple}. To estimate the overall effect of version while
+accounting for seed difficulty, we fit a mixed-effects logistic regression,
+$\text{harmful} \sim \text{version} \times \text{model} + (1 \mid \text{seed})$,
+using lme4 \citep{bates2015fitting}.
+
+\section{Guard-Model Evaluation}
+\label{sec:guards}
+
+We screen every prompt (input moderation) and every harmful or answered
+response (output moderation) with \todo{list guard models}. We report recall
+on harmful seeds and the false-positive rate on benign controls, per version.
+
+\section{Mechanistic Analysis}
+\label{sec:mech}
+
+For the open-weight models we analyze why safety fails to transfer.
+First, we compare the number of tokens per prompt across versions.
+Second, following \citet{arditi2024refusal}, we compute a refusal direction
+as the difference between the mean last-token residual-stream activations of
+\todo{n} harmful and \todo{n} harmless English instructions, selecting the
+layer whose projection best separates held-out instructions (largest
+Cohen's $d$, among the first 80\% of layers). We then project the
+activations of every version of every seed onto this direction, and compute
+the layer-wise cosine similarity between each version and its English
+counterpart. Third, as a causal test, we add the refusal direction to the
+residual stream (scale $\alpha=\todo{x}$) while the model processes harmful
+Banglish, and measure whether refusals are restored.
+
+\section{Defenses}
+\label{sec:defenses}
+
+We evaluate three defenses on the held-out test seeds.
+\textbf{D1 (normalization before moderation):} Banglish input is converted
+to Bangla script with IndicXlit \citep{madhani2023aksharantar}, keeping
+English words unchanged, or translated to English by an LLM, before the
+guard model screens it.
+\textbf{D2 (safety fine-tuning):} we fine-tune open-weight models with LoRA
+\citep{hu2022lora} on the defense-training split, pairing harmful prompts in
+all five versions with refusals in the matching language, and benign
+controls with helpful reference answers to avoid over-refusal, mixed with
+general instruction data in a 1:1 ratio.
+\textbf{D3 (activation steering):} the intervention from
+Section~\ref{sec:mech}, applied at inference time.
+For each defense we report ASR, over-refusal, helpfulness on benign
+Banglish requests, performance on \todo{a general benchmark}, added latency,
+and robustness to an adaptive attacker who knows the defense
+\citep{nasr2025attacker}, e.g., by choosing spellings that defeat the
+transliterator.
+
+\section{Ethical Considerations}
+\label{sec:ethics}
+
+The study was approved by \todo{ethics board, approval number}. Annotators
+were adults who gave informed consent, were paid \todo{rate}, worked in
+sessions of at most 90 minutes, and could skip items or stop at any time.
+We excluded the most severe harm categories. Harmful prompts and model
+outputs are not released publicly; the benchmark is available under gated
+access with a usage agreement. We disclosed our findings to \todo{providers}
+on \todo{date}, \todo{n} days before submission.

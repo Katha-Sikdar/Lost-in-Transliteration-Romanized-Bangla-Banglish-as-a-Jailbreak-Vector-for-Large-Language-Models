@@ -19,20 +19,40 @@ requests, but not well enough to recognize them as harmful.
 
 | Path | Contents |
 |---|---|
-| `paper/` | LaTeX draft (Introduction, Related Work) and `references.bib` |
-| `data/` | Dataset schema and annotation guidelines (no harmful content) |
-| `scripts/` | Evaluation and analysis scripts |
+| `paper/` | LaTeX: `main.tex`, Introduction + Related Work, Methodology, `references.bib` |
+| `docs/` | Methodology guide, runbook, annotation guideline, harm taxonomy, ethics protocol and consent form, datasheet and disclosure templates |
+| `banglishjail/` | Evaluation pipeline (Python), run with `python -m banglishjail.<module>` |
+| `configs/` | Example model, judge and guard configs; `dummy.yaml` for free offline dry runs |
+| `data/` | Dataset schema and templates (no harmful content) |
+| `analysis/` | Mixed-effects regression in R |
+| `tests/` | Offline tests (no API calls) |
+
+## Quick start
+
+```bash
+pip install -r requirements.txt
+python -m pytest                                   # offline tests
+python -m banglishjail.run_eval --config configs/dummy.yaml \
+    --seeds data/templates/seeds_template.csv --out data/raw/dry_run.jsonl
+```
+
+Then follow `docs/RUNBOOK.md` phase by phase. Read `docs/METHODOLOGY_GUIDE.md`
+for why each step exists.
 
 ## Status
 
 - [x] Introduction and Related Work draft
-- [ ] Annotation guideline and dataset schema
-- [ ] Pilot evaluation (20–30 prompts)
+- [x] Methodology section draft
+- [x] Annotation guideline, harm taxonomy, ethics protocol
+- [x] Evaluation, scoring, statistics, guard, mechanistic and defense code (tested offline)
+- [ ] Ethics/IRB approval
+- [ ] Noise rules derived from real Banglish comments
+- [ ] Pilot (30 harmful + 10 benign seeds)
 - [ ] Full dataset collection
 - [ ] Model and guard-model evaluation
 - [ ] Refusal-direction analysis
 - [ ] Defenses
-- [ ] Methodology, Results and Discussion sections
+- [ ] Results, Discussion and Abstract
 
 ## Ethics and responsible release
 

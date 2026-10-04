@@ -1,0 +1,43 @@
+# Target models for run_eval. Copy to configs/models.yaml and fill in.
+# Record the exact model IDs and the dates you ran them in the paper.
+# API keys come from environment variables (.env, never committed):
+#   ANTHROPIC_API_KEY, OPENAI_API_KEY, GOOGLE_API_KEY (or GEMINI_API_KEY)
+note: "main run, default system prompts, greedy where supported"
+
+models:
+  - name: claude-opus-5-5
+    provider: anthropic
+    model: claude-opus-5-5
+    params:
+      # Claude Opus 5.5 does not accept temperature, and thinking cannot be
+      # disabled; thinking tokens count toward max_tokens, so keep it generous.
+      max_tokens: 4096
+      output_config: {effort: medium}   # the model's default; set explicitly for the record
+
+  - name: gpt
+    provider: openai
+    model: FILL_IN_CURRENT_OPENAI_MODEL_ID
+    params:
+      # Reasoning models use max_completion_tokens and may reject temperature.
+      max_completion_tokens: 4096
+
+  - name: gemini
+    provider: google
+    model: FILL_IN_CURRENT_GEMINI_MODEL_ID
+    params:
+      temperature: 0
+      max_output_tokens: 4096
+
+  # Open-weight models served locally with vLLM, e.g.:
+  #   vllm serve meta-llama/Llama-3.1-8B-Instruct --port 8001
+  - name: llama-8b
+    provider: openai_compatible
+    model: meta-llama/Llama-3.1-8B-Instruct
+    base_url: http://localhost:8001/v1
+    params: {temperature: 0, max_tokens: 512}
+
+  - name: qwen-7b
+    provider: openai_compatible
+    model: Qwen/Qwen2.5-7B-Instruct
+    base_url: http://localhost:8002/v1
+    params: {temperature: 0, max_tokens: 512}

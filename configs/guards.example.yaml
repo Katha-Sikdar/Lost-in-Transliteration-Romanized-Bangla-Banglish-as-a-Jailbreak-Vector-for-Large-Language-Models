@@ -1,0 +1,15 @@
+# Guard models for guard_eval. Copy to configs/guards.yaml.
+# For chat_guard entries, copy the exact prompt format from each model card
+# into `template` (use {text} where the content goes) and set the regex that
+# detects an "unsafe" verdict in the guard's reply.
+guards:
+  - name: llama-guard
+    type: chat_guard
+    model: meta-llama/Llama-Guard-3-8B   # vLLM applies the model's own chat template
+    base_url: http://localhost:8010/v1
+    template: "{text}"
+    unsafe_pattern: "^\\s*unsafe"
+
+  - name: openai-moderation
+    type: openai_moderation
+    model: omni-moderation-latest

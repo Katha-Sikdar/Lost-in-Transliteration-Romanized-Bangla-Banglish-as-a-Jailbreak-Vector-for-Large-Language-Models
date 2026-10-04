@@ -26,3 +26,16 @@ __pycache__/
 .venv/
 venv/
 .ipynb_checkpoints/
+
+# Results that contain prompt or response text
+results/**/guard_raw*.csv
+
+# Model checkpoints and adapters
+checkpoints/
+*.pt
+*.safetensors
+
+# Local configs may name private endpoints; commit only the *.example.yaml files
+configs/models.yaml
+configs/judge.yaml
+configs/guards.yaml

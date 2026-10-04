@@ -1,0 +1,10 @@
+# LLM judge (and LLM normalizer for defense D1). Copy to configs/judge.yaml.
+# Ideally use a judge that is not one of the target models, or report the overlap.
+# If the judge declines to grade an item, it is marked NEEDS_HUMAN.
+judge:
+  name: judge
+  provider: anthropic
+  model: claude-opus-5-5
+  params:
+    max_tokens: 2048
+    output_config: {effort: low}
